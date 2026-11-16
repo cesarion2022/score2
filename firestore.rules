@@ -1,0 +1,230 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net: deny everything by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Reusable Hardened Primitives ---
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isVerified() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isVerified() && (
+        request.auth.token.email == 'cesaraugustodiazp@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function hasParentUser(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId));
+    }
+
+    // --- Entity Validation Helpers ---
+    function isValidUserProfile(data, userId) {
+      return data.keys().hasAll(['uid', 'displayName', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'displayName', 'photoUrl', 'createdAt', 'updatedAt'])
+        && data.uid is string && data.uid == userId && isValidId(data.uid)
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 80
+        && (!('photoUrl' in data) || (data.photoUrl is string && data.photoUrl.size() <= 500))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidPrivateInfo(data, userId) {
+      return data.keys().hasAll(['uid', 'email', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'email', 'updatedAt'])
+        && data.uid is string && data.uid == userId && isValidId(data.uid)
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 254
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidClubSettings(data, userId) {
+      return data.keys().hasAll(['uid', 'sala', 'rate', 'n', 'mesa', 'updatedAt'])
+        && data.keys().hasOnly([
+          'uid', 'sala', 'nit', 'tel', 'dir', 'taxN', 'tax', 'taxOn',
+          'rate', 'sym', 'loc', 'dec', 'lang', 'theme', 'model',
+          'n', 'mesa', 'mem', 'delay', 'fac', 'names', 'colors', 'inv', 'updatedAt'
+        ])
+        && data.uid is string && data.uid == userId && isValidId(data.uid)
+        && data.sala is string && data.sala.size() >= 1 && data.sala.size() <= 80
+        && (!('nit' in data) || (data.nit is string && data.nit.size() <= 40))
+        && (!('tel' in data) || (data.tel is string && data.tel.size() <= 40))
+        && (!('dir' in data) || (data.dir is string && data.dir.size() <= 160))
+        && (!('taxN' in data) || (data.taxN is string && data.taxN.size() <= 30))
+        && (!('tax' in data) || (data.tax is number && data.tax >= 0 && data.tax <= 100))
+        && (!('taxOn' in data) || data.taxOn is bool)
+        && data.rate is number && data.rate >= 0 && data.rate <= 100000000
+        && (!('sym' in data) || (data.sym is string && data.sym.size() <= 6))
+        && (!('loc' in data) || (data.loc is string && data.loc.size() <= 12))
+        && (!('dec' in data) || (data.dec is number && data.dec >= 0 && data.dec <= 4))
+        && (!('lang' in data) || (data.lang is string && data.lang.size() <= 8))
+        && (!('theme' in data) || (data.theme is string && data.theme.size() <= 16))
+        && (!('model' in data) || (data.model is string && data.model.size() <= 4))
+        && data.n is number && data.n >= 2 && data.n <= 6
+        && data.mesa is number && data.mesa >= 1 && data.mesa <= 999
+        && (!('mem' in data) || (data.mem is number && data.mem >= 1 && data.mem <= 120))
+        && (!('delay' in data) || (data.delay is number && data.delay >= 0 && data.delay <= 120))
+        && (!('fac' in data) || (data.fac is number && data.fac >= 0))
+        && (!('names' in data) || (data.names is list && data.names.size() <= 6 && (data.names.size() == 0 || data.names[0] is string)))
+        && (!('colors' in data) || (data.colors is list && data.colors.size() <= 6 && (data.colors.size() == 0 || data.colors[0] is string)))
+        && (!('inv' in data) || (data.inv is list && data.inv.size() <= 100 && (data.inv.size() == 0 || data.inv[0] is map)))
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidSaleRecord(data, userId) {
+      return data.keys().hasAll(['uid', 'no', 'mesa', 'd', 'cons', 'time', 'tax', 'tot', 'createdAt'])
+        && data.keys().hasOnly(['uid', 'no', 'mesa', 'd', 'cons', 'time', 'tax', 'tot', 'winner', 'createdAt'])
+        && data.uid is string && data.uid == userId && isValidId(data.uid)
+        && data.no is number && data.no >= 0
+        && data.mesa is number && data.mesa >= 1 && data.mesa <= 999
+        && data.d is number && data.d > 0
+        && data.cons is number && data.cons >= 0
+        && data.time is number && data.time >= 0
+        && data.tax is number && data.tax >= 0
+        && data.tot is number && data.tot >= 0
+        && (!('winner' in data) || (data.winner is string && data.winner.size() <= 80))
+        && data.createdAt is timestamp;
+    }
+
+    function isValidExpenseRecord(data, userId) {
+      return data.keys().hasAll(['uid', 'd', 'n', 'v', 'createdAt'])
+        && data.keys().hasOnly(['uid', 'd', 'n', 'v', 'createdAt'])
+        && data.uid is string && data.uid == userId && isValidId(data.uid)
+        && data.d is number && data.d > 0
+        && data.n is string && data.n.size() >= 1 && data.n.size() <= 120
+        && data.v is number && data.v > 0
+        && data.createdAt is timestamp;
+    }
+
+    function isValidTableState(data, userId) {
+      return data.keys().hasAll(['uid', 'sc', 'sets', 'names', 'n', 'el', 'run', 'last', 'cart', 'mesa', 'rate', 'closed', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'sc', 'sets', 'names', 'n', 'el', 'run', 'last', 'cart', 'mesa', 'rate', 'closed', 'updatedAt'])
+        && data.uid is string && data.uid == userId && isValidId(data.uid)
+        && data.sc is list && data.sc.size() == 6 && data.sc[0] is number
+        && data.sets is list && data.sets.size() == 6 && data.sets[0] is number
+        && data.names is list && data.names.size() == 6 && data.names[0] is string
+        && data.n is number && data.n >= 2 && data.n <= 6
+        && data.el is number && data.el >= 0
+        && data.run is bool
+        && data.last is number && data.last >= 0
+        && data.cart is map && data.cart.size() <= 100
+        && data.mesa is number && data.mesa >= 1 && data.mesa <= 999
+        && data.rate is number && data.rate >= 0
+        && data.closed is bool
+        && data.updatedAt is timestamp;
+    }
+
+    // --- Collection Rules ---
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isValidId(userId) && isOwner(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(userId) && (isOwner(userId) || isAdmin())
+        && isValidUserProfile(incoming(), userId)
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoUrl', 'updatedAt']);
+      allow delete: if false;
+
+      match /private/{docId} {
+        allow get: if isValidId(userId) && isValidId(docId) && docId == 'info' && isOwner(userId);
+        allow list: if false;
+        allow create: if isValidId(userId) && isValidId(docId) && docId == 'info' && isOwner(userId)
+          && isValidPrivateInfo(incoming(), userId)
+          && incoming().updatedAt == request.time;
+        allow update: if isValidId(userId) && isValidId(docId) && docId == 'info' && isOwner(userId)
+          && isValidPrivateInfo(incoming(), userId)
+          && incoming().uid == existing().uid
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly(['email', 'updatedAt']);
+        allow delete: if false;
+      }
+
+      match /club/{docId} {
+        allow get: if isValidId(userId) && isValidId(docId) && docId == 'settings' && (isOwner(userId) || isAdmin());
+        allow list: if false;
+        allow create: if isValidId(userId) && isValidId(docId) && docId == 'settings' && isOwner(userId)
+          && isValidClubSettings(incoming(), userId)
+          && incoming().updatedAt == request.time
+          && hasParentUser(userId);
+        allow update: if isValidId(userId) && isValidId(docId) && docId == 'settings' && (isOwner(userId) || isAdmin())
+          && isValidClubSettings(incoming(), userId)
+          && incoming().uid == existing().uid
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'sala', 'nit', 'tel', 'dir', 'taxN', 'tax', 'taxOn',
+            'rate', 'sym', 'loc', 'dec', 'lang', 'theme', 'model',
+            'n', 'mesa', 'mem', 'delay', 'fac', 'names', 'colors', 'inv', 'updatedAt'
+          ]);
+        allow delete: if false;
+      }
+
+      match /sales/{saleId} {
+        allow get: if isValidId(userId) && isValidId(saleId) && (isOwner(userId) || isAdmin());
+        allow list: if (isOwner(userId) || isAdmin()) && resource.data.uid == userId;
+        allow create: if isValidId(userId) && isValidId(saleId) && isOwner(userId)
+          && isValidSaleRecord(incoming(), userId)
+          && incoming().createdAt == request.time
+          && hasParentUser(userId);
+        allow update: if false;
+        allow delete: if isValidId(userId) && isValidId(saleId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /expenses/{expenseId} {
+        allow get: if isValidId(userId) && isValidId(expenseId) && (isOwner(userId) || isAdmin());
+        allow list: if (isOwner(userId) || isAdmin()) && resource.data.uid == userId;
+        allow create: if isValidId(userId) && isValidId(expenseId) && isOwner(userId)
+          && isValidExpenseRecord(incoming(), userId)
+          && incoming().createdAt == request.time
+          && hasParentUser(userId);
+        allow update: if false;
+        allow delete: if isValidId(userId) && isValidId(expenseId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /tables/{tableId} {
+        allow get: if isValidId(userId) && isValidId(tableId) && (isOwner(userId) || isAdmin());
+        allow list: if (isOwner(userId) || isAdmin()) && resource.data.uid == userId;
+        allow create: if isValidId(userId) && isValidId(tableId) && isOwner(userId)
+          && isValidTableState(incoming(), userId)
+          && incoming().updatedAt == request.time
+          && hasParentUser(userId);
+        allow update: if isValidId(userId) && isValidId(tableId) && (isOwner(userId) || isAdmin())
+          && isValidTableState(incoming(), userId)
+          && incoming().uid == existing().uid
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'sc', 'sets', 'names', 'n', 'el', 'run', 'last', 'cart', 'mesa', 'rate', 'closed', 'updatedAt'
+          ]);
+        allow delete: if isValidId(userId) && isValidId(tableId) && (isOwner(userId) || isAdmin());
+      }
+    }
+  }
+}

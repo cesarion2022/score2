@@ -1,0 +1,180 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Basic user profile stored under users/{userId}.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "photoUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "displayName", "createdAt", "updatedAt"]
+    },
+    "UserPrivateInfo": {
+      "title": "UserPrivateInfo",
+      "description": "Private PII isolated under users/{userId}/private/info.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 254
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "updatedAt"]
+    },
+    "ClubSettings": {
+      "title": "ClubSettings",
+      "description": "Club configuration, rates, tax settings, player defaults, and bounded product inventory.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "sala": { "type": "string", "maxLength": 80 },
+        "nit": { "type": "string", "maxLength": 40 },
+        "tel": { "type": "string", "maxLength": 40 },
+        "dir": { "type": "string", "maxLength": 160 },
+        "taxN": { "type": "string", "maxLength": 30 },
+        "tax": { "type": "number" },
+        "taxOn": { "type": "boolean" },
+        "rate": { "type": "number" },
+        "sym": { "type": "string", "maxLength": 6 },
+        "loc": { "type": "string", "maxLength": 12 },
+        "dec": { "type": "number" },
+        "lang": { "type": "string", "maxLength": 8 },
+        "theme": { "type": "string", "maxLength": 16 },
+        "model": { "type": "string", "maxLength": 4 },
+        "n": { "type": "number" },
+        "mesa": { "type": "number" },
+        "mem": { "type": "number" },
+        "delay": { "type": "number" },
+        "fac": { "type": "number" },
+        "names": { "type": "array" },
+        "colors": { "type": "array" },
+        "inv": { "type": "array" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "sala", "rate", "n", "mesa", "updatedAt"]
+    },
+    "SaleRecord": {
+      "title": "SaleRecord",
+      "description": "Closed table ticket and accounting sale record.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "no": { "type": "number" },
+        "mesa": { "type": "number" },
+        "d": { "type": "number" },
+        "cons": { "type": "number" },
+        "time": { "type": "number" },
+        "tax": { "type": "number" },
+        "tot": { "type": "number" },
+        "winner": { "type": "string", "maxLength": 80 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "no", "mesa", "d", "cons", "time", "tax", "tot", "createdAt"]
+    },
+    "ExpenseRecord": {
+      "title": "ExpenseRecord",
+      "description": "Accounting expense entry.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "d": { "type": "number" },
+        "n": { "type": "string", "maxLength": 120 },
+        "v": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "d", "n", "v", "createdAt"]
+    },
+    "TableState": {
+      "title": "TableState",
+      "description": "Active scoreboard state for a billiard table.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "sc": { "type": "array" },
+        "sets": { "type": "array" },
+        "names": { "type": "array" },
+        "n": { "type": "number" },
+        "el": { "type": "number" },
+        "run": { "type": "boolean" },
+        "last": { "type": "number" },
+        "cart": { "type": "object" },
+        "mesa": { "type": "number" },
+        "rate": { "type": "number" },
+        "closed": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "sc", "sets", "names", "n", "el", "run", "last", "cart", "mesa", "rate", "closed", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Owner-isolated user profile document."
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": { "$ref": "#/entities/UserPrivateInfo" },
+      "description": "Owner-isolated PII document (email)."
+    },
+    "/users/{userId}/club/{docId}": {
+      "schema": { "$ref": "#/entities/ClubSettings" },
+      "description": "Owner's Billar Pro club configuration and product inventory."
+    },
+    "/users/{userId}/sales/{saleId}": {
+      "schema": { "$ref": "#/entities/SaleRecord" },
+      "description": "Owner's closed table sales history."
+    },
+    "/users/{userId}/expenses/{expenseId}": {
+      "schema": { "$ref": "#/entities/ExpenseRecord" },
+      "description": "Owner's accounting expense records."
+    },
+    "/users/{userId}/tables/{tableId}": {
+      "schema": { "$ref": "#/entities/TableState" },
+      "description": "Live scoreboard state per table persisted for recovery across sessions."
+    }
+  }
+}

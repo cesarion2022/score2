@@ -1,0 +1,97 @@
+/**
+ * Security Rules Verification Suite (Dirty Dozen Adversarial Payloads)
+ * Documents expected PERMISSION_DENIED outcomes for every attack vector in security_spec.md.
+ */
+export const DIRTY_DOZEN_CASES = [
+  {
+    id: 1,
+    name: 'Unauthenticated Read/Write',
+    path: 'users/u1/club/settings',
+    auth: null,
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    id: 2,
+    name: 'Cross-User Profile Hijack',
+    path: 'users/u1',
+    auth: { uid: 'u2', email_verified: true },
+    payload: { uid: 'u1', displayName: 'Attacker' },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    id: 3,
+    name: 'UID Spoofing on Create',
+    path: 'users/u2',
+    auth: { uid: 'u2', email_verified: true },
+    payload: { uid: 'u1', displayName: 'Spoofer' },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    id: 4,
+    name: 'Shadow Field Injection',
+    path: 'users/u1',
+    auth: { uid: 'u1', email_verified: true },
+    payload: { uid: 'u1', displayName: 'Host', isAdmin: true },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    id: 5,
+    name: 'Email Spoofing (Unverified Email)',
+    path: 'users/u1',
+    auth: { uid: 'u2', email: 'cesaraugustodiazp@gmail.com', email_verified: false },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    id: 6,
+    name: 'PII Leak',
+    path: 'users/u1/private/info',
+    auth: { uid: 'u2', email_verified: true },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    id: 7,
+    name: 'ID Poisoning (1.5KB Document ID)',
+    path: `users/u1/sales/${'a'.repeat(1500)}`,
+    auth: { uid: 'u1', email_verified: true },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    id: 8,
+    name: 'Type Poisoning on Update',
+    path: 'users/u1/tables/1',
+    auth: { uid: 'u1', email_verified: true },
+    payload: { rate: 'free', sc: 'bad' },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    id: 9,
+    name: 'Array Overflow (Denial of Wallet)',
+    path: 'users/u1/club/settings',
+    auth: { uid: 'u1', email_verified: true },
+    payload: { inv: Array.from({ length: 101 }, (_, i) => ({ n: `P${i}`, p: 1, s: 1, m: 1 })) },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    id: 10,
+    name: 'Immutable Field Tampering',
+    path: 'users/u1',
+    auth: { uid: 'u1', email_verified: true },
+    payload: { uid: 'u2' },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    id: 11,
+    name: 'Client-Forged Timestamp',
+    path: 'users/u1/sales/s1',
+    auth: { uid: 'u1', email_verified: true },
+    payload: { createdAt: '2020-01-01T00:00:00Z' },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    id: 12,
+    name: 'Blanket List Query Scraping',
+    path: 'users/u1/sales',
+    auth: { uid: 'u2', email_verified: true },
+    expected: 'PERMISSION_DENIED',
+  },
+];

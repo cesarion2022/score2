@@ -1,0 +1,6 @@
+{
+  "name": "Billar Pro · Marcador",
+  "description": "Marcador de billar en red local con host y 5 espectadores sincronizados en tiempo real.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
