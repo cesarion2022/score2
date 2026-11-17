@@ -61,8 +61,18 @@ button,select,input{touch-action:manipulation}html{-webkit-tap-highlight-color:t
 /* RED: modo espectador (solo lectura) */
 body.viewer .bt,body.viewer .act,body.viewer #bset,body.viewer #bcfg,body.viewer #badm,body.viewer #rs,body.viewer #cl,body.viewer #bell,body.viewer #p-shop,body.viewer #bauth{pointer-events:none;opacity:.45}
 body.viewer .nm,body.viewer #mesa{pointer-events:none}
+/* RED: 10 Estaciones de trabajo en Admin */
+#madm .box{max-width:880px}
+.stgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:10px;margin:8px 0 14px}
+.stcard{background:color-mix(in srgb,var(--tx) 6%,var(--pn));border:1px solid color-mix(in srgb,var(--tx) 18%,transparent);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.stcard.run{border-color:#22c55e;box-shadow:0 0 14px #22c55e33}
+.stcard.cur{border-color:var(--ac);box-shadow:var(--gl)}
+.sttop{display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:700}
+.stbadge{font-size:11px;padding:2px 8px;border-radius:12px;background:color-mix(in srgb,var(--tx) 12%,var(--pn))}
+.stcard.run .stbadge{background:#16a34a;color:#fff}
+.stbtns{display:flex;gap:6px;flex-wrap:wrap}.stbtns button{flex:1;padding:6px 8px;font-size:12px;min-height:34px}
 </style></head><body>
-<header><div class="mesa"><span data-t="0"></span>: <input id="mesa" type="number" min="1" style="width:54px;padding:2px 4px;font-weight:700"></div><div class="brand" id="brand"></div>
+<header><div class="mesa"><span data-t="0"></span>: <input id="mesa" type="number" min="1" max="10" style="width:54px;padding:2px 4px;font-weight:700"></div><div class="brand" id="brand"></div>
 <select id="lang"><option value="es">Español</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="ko">한국어</option><option value="vi">Tiếng Việt</option></select>
 <button class="ac" id="bset" data-t="1"></button><button id="bcfg">⚙</button><button id="badm">🔒 Admin</button><button id="bauth" title="Cuenta Google">☁ Google</button><button id="fs">⛶</button></header>
 <div class="grid"><div class="col" id="pl0"></div>
@@ -84,9 +94,9 @@ body.viewer .nm,body.viewer #mesa{pointer-events:none}
 <div><label data-t="19"></label><select id="np"><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div><div><label data-t="15"></label><input type="number" id="rate" min="0" step="500"></div>
 <div><label data-t="16"></label><input id="sym" maxlength="6"></div><div><label>Formato</label><select id="loc"><option>es-CO</option><option>en-US</option><option>de-DE</option><option>fr-FR</option><option>it-IT</option><option>ko-KR</option><option>vi-VN</option></select></div><div><label>Decimales</label><select id="dec"><option>0</option><option>2</option></select></div></div>
 <label>Colores</label><div class="row" id="cols"></div><label data-t="31"></label><textarea id="pr" rows="7"></textarea><div class="row"><button class="ac" id="ok">OK</button></div></div></div>
-<div class="mod" id="mtk"><div style="width:100%"><div class="paper" id="paper"></div><div class="row" style="justify-content:center"><button class="ac" id="dl" data-t="13"></button><button class="ac" id="fe" style="background:#a78bfa">🧾 Factura electrónica</button><a id="wa" target="_blank" rel="noopener"><button style="background:#25d366;color:#04210f" data-t="14"></button></a><button id="nw" data-t="32"></button></div></div></div>
+<div class="mod" id="mtk"><div style="width:100%"><div class="paper" id="paper"></div><div class="row" style="justify-content:center"><button class="ac" id="dl" data-t="13"></button><button class="ac" id="fe" style="background:#a78bfa">🧾 Factura electrónica</button><a id="wa" target="_blank" rel="noopener"><button style="background:#25d366;color:#04210f" data-t="14"></button></a><button id="nw" data-t="32"></button><button id="tkx">✕ Cerrar ticket</button></div></div></div>
 <div class='mod' id='mpin'><div class='box' style='max-width:320px;text-align:center'><h3>🔒 Clave</h3><input id='pin' type='text' readonly tabindex='-1' placeholder='••••' style='text-align:center;font-size:28px;letter-spacing:10px;pointer-events:none'><div id='kp' style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0'><button data-k='1'>1</button><button data-k='2'>2</button><button data-k='3'>3</button><button data-k='4'>4</button><button data-k='5'>5</button><button data-k='6'>6</button><button data-k='7'>7</button><button data-k='8'>8</button><button data-k='9'>9</button><button data-k='b'>⌫</button><button data-k='0'>0</button><button data-k='g' class='ac'>✓</button></div><div class='row' style='justify-content:center'><button class='ac' id='pgo'>Entrar</button><button id='pcx'>✕</button></div></div></div>
-<div class='mod' id='madm'><div class='box' style='max-width:720px'><h3>🛠 Panel administrativo</h3><div class='cols' id='admf'><div><label>Nombre de la sala</label><input id='sala'></div><div><label>Logo</label><input type='file' id='lg' accept='image/*'></div></div><div class='row'><button id='lgx'>Quitar logo</button></div><div class='cols'><div><label>NIT / ID del negocio</label><input id='nit'></div><div><label>Teléfono</label><input id='tel'></div><div><label>Dirección</label><input id='dir'></div><div><label>Nombre del impuesto</label><input id='taxn'></div><div><label>Impuesto %</label><input id='tax' type='number' min='0' step='0.5'></div><div><label>¿Aplicar impuesto?</label><select id='taxon'><option value='0'>No</option><option value='1'>Sí</option></select></div></div><h4>📦 Inventario (precios y stock)</h4><div id='inv'></div><div class='row'><button class='ac' id='iadd'>+ Producto</button></div><h4>📊 Contabilidad</h4><div id='rep' class='st'></div><div id='sl' class='st' style='max-height:140px;overflow:auto;margin-top:6px'></div><h4>💸 Gastos</h4><div class='row'><input id='gn' placeholder='Descripción' style='flex:2'><input id='gv' type='number' placeholder='Valor' style='flex:1'><button class='ac' id='gadd'>+ Gasto</button></div><div id='gl' class='st'></div><div class='row'><button id='csv'>⬇ Exportar CSV</button><button id='rrs'>Borrar ventas y gastos</button></div><h4>🔑 Cambiar claves</h4><label>Clave del panel admin</label><div class='row'><input id='np2' type='password' inputmode='numeric' placeholder='Nueva clave (4-8 dígitos)' style='flex:1'><button class='ac' id='pch'>Guardar</button></div><label>Clave de reiniciar</label><div class='row'><input id='np3' type='password' inputmode='numeric' placeholder='Nueva clave de reiniciar (4-8 dígitos)' style='flex:1'><button class='ac' id='pch2'>Guardar</button></div><div class='row'><button class='ac' id='aok'>Cerrar</button></div></div></div><div class='mod' id='mwf'><div class='box' style='max-width:460px'><h3>📶 Conectar cámara WiFi</h3><ol style='padding-left:18px;line-height:1.6'><li>Conecta el celular (o la cámara) y este equipo a la <b>misma red WiFi</b>.</li><li>En el celular instala <b>DroidCam</b> o <b>Iriun Webcam</b> y su cliente en el computador. Para cámaras IP usa <b>OBS</b> con Cámara virtual.</li><li>Abre la app: queda como cámara web. La cámara de la propia tablet aparece directamente.</li><li>Pulsa “Buscar cámaras”, elige la tuya en la lista y pulsa “Iniciar cámara”.</li></ol><div class='row'><button class='ac' id='wfs'>🔄 Buscar cámaras</button><button id='wfx'>Cerrar</button></div><p class='st'>La página no puede abrir direcciones RTSP/HTTP directas; por eso se usa una app puente.</p></div></div>
+<div class='mod' id='madm'><div class='box'><h3>🛠 Panel administrativo</h3><div class='cols' id='admf'><div><label>Nombre de la sala</label><input id='sala'></div><div><label>Logo</label><input type='file' id='lg' accept='image/*'></div></div><div class='row'><button id='lgx'>Quitar logo</button></div><div class='cols'><div><label>NIT / ID del negocio</label><input id='nit'></div><div><label>Teléfono</label><input id='tel'></div><div><label>Dirección</label><input id='dir'></div><div><label>Nombre del impuesto</label><input id='taxn'></div><div><label>Impuesto %</label><input id='tax' type='number' min='0' step='0.5'></div><div><label>¿Aplicar impuesto?</label><select id='taxon'><option value='0'>No</option><option value='1'>Sí</option></select></div></div><h4>🎱 Estaciones de trabajo (10 mesas en red)</h4><div id='stsum' class='st'></div><div id='stations' class='stgrid'></div><h4>📦 Inventario (precios y stock)</h4><div id='inv'></div><div class='row'><button class='ac' id='iadd'>+ Producto</button></div><h4>📊 Contabilidad</h4><div id='rep' class='st'></div><div id='sl' class='st' style='max-height:140px;overflow:auto;margin-top:6px'></div><h4>💸 Gastos</h4><div class='row'><input id='gn' placeholder='Descripción' style='flex:2'><input id='gv' type='number' placeholder='Valor' style='flex:1'><button class='ac' id='gadd'>+ Gasto</button></div><div id='gl' class='st'></div><div class='row'><button id='csv'>⬇ Exportar CSV</button><button id='rrs'>Borrar ventas y gastos</button></div><h4>🔑 Cambiar claves</h4><label>Clave del panel admin</label><div class='row'><input id='np2' type='password' inputmode='numeric' placeholder='Nueva clave (4-8 dígitos)' style='flex:1'><button class='ac' id='pch'>Guardar</button></div><label>Clave de reiniciar</label><div class='row'><input id='np3' type='password' inputmode='numeric' placeholder='Nueva clave de reiniciar (4-8 dígitos)' style='flex:1'><button class='ac' id='pch2'>Guardar</button></div><div class='row'><button class='ac' id='aok'>Cerrar</button></div></div></div><div class='mod' id='mwf'><div class='box' style='max-width:460px'><h3>📶 Conectar cámara WiFi</h3><ol style='padding-left:18px;line-height:1.6'><li>Conecta el celular (o la cámara) y este equipo a la <b>misma red WiFi</b>.</li><li>En el celular instala <b>DroidCam</b> o <b>Iriun Webcam</b> y su cliente en el computador. Para cámaras IP usa <b>OBS</b> con Cámara virtual.</li><li>Abre la app: queda como cámara web. La cámara de la propia tablet aparece directamente.</li><li>Pulsa “Buscar cámaras”, elige la tuya en la lista y pulsa “Iniciar cámara”.</li></ol><div class='row'><button class='ac' id='wfs'>🔄 Buscar cámaras</button><button id='wfx'>Cerrar</button></div><p class='st'>La página no puede abrir direcciones RTSP/HTTP directas; por eso se usa una app puente.</p></div></div>
 <div class='mod' id='minv'><div class='box' style='max-width:460px'><h3>🧾 Factura electrónica</h3><label>Cliente (nombre / razón social)</label><input id='cn'><div class='cols'><div><label>NIT / Cédula</label><input id='cid'></div><div><label>Correo</label><input id='cm' type='email'></div></div><label>Dirección</label><input id='cd'><p class='st'>Consecutivo: <b id='cons'></b></p><div class='row'><button class='ac' id='finv'>⬇ Descargar factura</button><a id='fwa' target='_blank' rel='noopener'><button style='background:#25d366;color:#04210f'>WhatsApp</button></a><button id='fx'>✕</button></div><p class='st'>Documento con consecutivo propio. Para validez ante la DIAN debe emitirse con un proveedor tecnológico autorizado.</p></div></div>
 <div id='svc'></div><canvas id='cf'></canvas><div class="toast" id="ts"></div>
 <script src="/socket.io/socket.io.js"></script><!-- RED: cliente Socket.IO -->
@@ -114,12 +124,14 @@ function toast(m){const e=$('ts');e.textContent=m;e.style.display='block';clearT
 let sc=Array(6).fill(0),sets=Array(6).fill(0),cart={},el=0,run=false,last=0,closed=false;
 
 // RED: ================= RED LOCAL (Socket.IO) =================
-const qParams=new URLSearchParams(location.search);// RED: permite probar ?viewer=1 en cualquier URL
+const qParams=new URLSearchParams(location.search);// RED: permite ?viewer=1 o ?mesa=1..10
+const qMesa=parseInt(qParams.get('mesa')||'',10);if(qMesa>=1&&qMesa<=10)S.mesa=qMesa;
 const isLanIp=/^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(location.hostname);// RED: IP privada WiFi = espectador
 const isHost=qParams.has('viewer')?false:(qParams.has('host')?true:(location.protocol==='file:'||['localhost','127.0.0.1','[::1]'].includes(location.hostname)||!isLanIp));// RED: localhost/preview=host, IP WiFi=espectador
 const socket=(typeof io!=='undefined')?io():null;// RED: null si abres el archivo sin servidor
-let synced=false;// RED: el host adopta el estado del servidor solo la primera vez
+let synced=false,switchingMesa=false,stationsList=[];// RED: control de sala y lista de 10 estaciones
 function currentElapsed(){return run?el+(Date.now()-last):el}// RED
+function stElapsed(st){return st.run?(st.el||0)+Math.max(0,Date.now()-(st.rxAt||Date.now())):(st.el||0)}// RED
 function pushState(){// RED: solo el host envía
   if(!isHost)return;
   const payload={sc:sc,sets:sets,names:S.names,n:S.n,el:currentElapsed(),run:run,last:Date.now(),cart:cart,mesa:S.mesa,rate:S.rate,closed:closed,
@@ -134,12 +146,26 @@ function applyState(st){// RED
   if(isHost)save();
   $('mesa').value=S.mesa;$('rate').value=S.rate;
   rI();rP();rS();rShop();rT();rB()}
+function switchMesa(nextM){// RED: cambia a otra de las 10 estaciones de trabajo
+  const m=Math.min(10,Math.max(1,parseInt(nextM,10)||1));
+  if(m===S.mesa&&synced){$('mesa').value=m;return}
+  if(isHost&&synced)pushState();
+  S.mesa=m;$('mesa').value=m;save();
+  switchingMesa=true;synced=false;
+  if(socket&&socket.connected){socket.emit('hello',{role:isHost?'host':'viewer',mesa:S.mesa})}
+  else{sc.fill(0);sets.fill(0);el=0;run=false;cart={};closed=false;rI();rP();rShop();rT()}}
 if(socket){
-  socket.on('connect',()=>{socket.emit('hello',{role:isHost?'host':'viewer'});if(isHost&&synced)pushState()});// RED: si el host se reconecta, reenvía su estado
+  socket.on('connect',()=>{socket.emit('hello',{role:isHost?'host':'viewer',mesa:S.mesa});if(isHost&&synced&&!switchingMesa)pushState()});// RED: si el host se reconecta, reenvía su estado
   socket.on('state',st=>{// RED
-    if(isHost){if(synced)return;synced=true;if(!st.init){pushState();return}}// RED: el host ignora el eco; solo adopta el estado inicial
-    else if(!st.init)return;
-    applyState(st)})}
+    if(isHost){
+      if(switchingMesa){switchingMesa=false;synced=true;applyState(st);if(!st.init)pushState();return}
+      if(synced)return;synced=true;if(!st.init){pushState();return}
+    }else if(!st.init)return;
+    applyState(st)});
+  socket.on('stations',list=>{// RED: resumen en vivo de las 10 estaciones para Admin
+    const now=Date.now();
+    stationsList=(list||[]).map(x=>({...x,rxAt:now}));
+    if($('madm').classList.contains('on'))rStations()})}
 if(!isHost){$('mesa').readOnly=true;$('mesa').tabIndex=-1;document.addEventListener('click',e=>{if(e.target.closest('.bt,.act,#bset,#bcfg,#badm,#rs,#cl,#bell,#p-shop,#bauth')){e.stopPropagation();e.preventDefault()}},true)}// RED: bloquea también teclado/tab
 if(isHost)setInterval(pushState,5000);// RED: latido cada 5 s (re-sincroniza cambios del panel admin y corrige deriva)
 // RED: =========================================================
@@ -152,7 +178,7 @@ const n=d.querySelector('.nm');n.value=S.names[i];if(!isHost){n.readOnly=true;n.
 function rS(){Q('.card').forEach((c,i)=>{c.querySelector('.sc').textContent=sc[i];c.querySelector('.sw').textContent=sets[i]})}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(b){const i=+b.dataset.i;sc[i]=Math.max(0,sc[i]+ +b.dataset.d);rS();pushState()/* RED */}});
 $('bset').onclick=()=>{const m=Math.max(...sc.slice(0,S.n));if(m>0){const w=sc.slice(0,S.n).map((v,i)=>v==m?i:-1).filter(i=>i>=0);if(w.length==1)sets[w[0]]++}sc=sc.map(()=>0);rS();pushState()/* RED */};
-function rT(){if(run&&isHost){el+=Date.now()-last;last=Date.now()}/* RED: solo el host acumula */$('bt').textContent=hms(currentElapsed());/* RED */$('bc').textContent=fmt(charge());$('bk').textContent=fmt(cons());$('bn').textContent=fmt(sub()+taxAmt())}
+function rT(){if(run&&isHost){el+=Date.now()-last;last=Date.now()}/* RED: solo el host acumula */$('bt').textContent=hms(currentElapsed());/* RED */$('bc').textContent=fmt(charge());$('bk').textContent=fmt(cons());$('bn').textContent=fmt(sub()+taxAmt());if($('madm').classList.contains('on'))tickStations()}
 setInterval(rT,500);
 $('go').onclick=()=>{if(run)rT();else last=Date.now();run=!run;if(run&&stream&&!recOn)startRec();rI();pushState()/* RED */};
 function doReset(){closed=false;run=false;el=0;sc.fill(0);sets.fill(0);cart={};rI();rP();rShop();rT();pushState()/* RED: reinicio */};
@@ -193,7 +219,8 @@ $('st').onchange=()=>{if(!$('au').paused){$('au').src=$('st').value;$('au').play
 // ajustes
 function fillCfg(){['th:theme','md:model','np:n','rate:rate','sym:sym','loc:loc','dec:dec','pr:prods','mem:mem','lang:lang','mesa:mesa'].forEach(s=>{const[a,b]=s.split(':');$(a).value=S[b]});$('dr').value=S.delay;$('dv').textContent=S.delay;$('cols').innerHTML=S.colors.map((c,i)=>'<input type="color" data-k="'+i+'" value="'+c+'">').join('')}
 $('bcfg').onclick=()=>{fillCfg();$('mset').classList.add('on')};$('ok').onclick=()=>$('mset').classList.remove('on');
-['th:theme','md:model','np:n','rate:rate','sym:sym','loc:loc','dec:dec','pr:prods','mem:mem','lang:lang','mesa:mesa'].forEach(s=>{const[a,b]=s.split(':');$(a).oninput=()=>{S[b]=['n','rate','mem','mesa'].includes(b)?+$(a).value:$(a).value;save();rI();if(b=='n')rP();rShop();pushState()/* RED: mesa, tarifa, jugadores... */}});
+['th:theme','md:model','np:n','rate:rate','sym:sym','loc:loc','dec:dec','pr:prods','mem:mem','lang:lang'].forEach(s=>{const[a,b]=s.split(':');$(a).oninput=()=>{S[b]=['n','rate','mem'].includes(b)?+$(a).value:$(a).value;save();rI();if(b=='n')rP();rShop();pushState()/* RED: tarifa, jugadores... */}});
+$('mesa').onchange=()=>switchMesa($('mesa').value);// RED: cambiar estación desde encabezado
 $('cols').oninput=e=>{if(e.target.dataset.k!==undefined){S.colors[e.target.dataset.k]=e.target.value;save();rP()}};
 // ticket
 function winner(){const n=S.n,k=i=>sets[i]*1000+sc[i],m=Math.max(...Array.from({length:n},(_,i)=>k(i))),w=[...Array(n).keys()].filter(i=>k(i)==m);return w.length==1?S.names[w[0]]:null}
@@ -204,6 +231,7 @@ $('cl').onclick=()=>{if(run)rT();run=false;stopRec();rI();no=Date.now()%100000;i
 $('paper').innerHTML='<div class="tro">🏆</div>'+(S.logo?'<img src="'+S.logo+'" style="display:block;margin:0 auto;max-height:64px">':'')+'<h2>'+esc(S.sala)+'</h2><div style="text-align:center;font-size:12px">'+t(35)+' #'+String(no).padStart(5,'0')+' · '+t(0)+' '+S.mesa+'<br>'+d+'</div><hr><div class="win">'+(w?'👑 '+t(12)+': '+esc(w):'🤝 '+t(28))+'</div><div style="margin:8px 0">'+S.names.slice(0,S.n).map((n,i)=>'<div class="tr" style="animation-delay:'+i*.1+'s"><span>'+esc(n)+'</span><span>'+sc[i]+' · SET '+sets[i]+'</span></div>').join('')+'</div>'+L.map((r,i)=>'<div class="tr" style="animation-delay:'+(.5+i*.12)+'s"><span>'+esc(r[0])+'</span><span>'+r[1]+'</span></div>').join('')+'<div class="tr t" style="animation-delay:'+(.6+L.length*.12)+'s"><span>'+t(10)+'</span><span>'+tot()+'</span></div><p style="text-align:center;margin:14px 0 0;font-size:13px">★ '+t(29)+' ★<br>Tolitecno · WhatsApp +57 316 527 5176</p>';
 const msg='🎱 '+S.sala+' #'+no+' · '+t(0)+' '+S.mesa+'\n'+(w?'🏆 '+w:'🤝 '+t(28))+'\n'+L.map(r=>r.join(': ')).join('\n')+'\n'+t(10)+': '+tot();$('wa').href='https://wa.me/573165275176?text='+encodeURIComponent(msg);$('mtk').classList.add('on');conf();pushState()/* RED: cerrar cuenta */};
 $('nw').onclick=()=>{$('mtk').classList.remove('on');doReset()};
+$('tkx').onclick=()=>$('mtk').classList.remove('on');// RED: cerrar modal de ticket sin reiniciar partida
 $('dl').onclick=()=>{const L=lines(),W=640,H=330+(S.n+L.length)*40+210,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),F='Courier New,monospace';x.fillStyle='#fffdf6';x.fillRect(0,0,W,H);x.fillStyle='#1b1b1b';x.textAlign='center';x.font='80px serif';if(LG.naturalWidth){const h=70,lw=LG.naturalWidth/LG.naturalHeight*h;x.drawImage(LG,(W-lw)/2,15,lw,h)}else x.fillText('🏆',W/2,100);x.font='700 44px '+F;x.fillStyle='#b45309';x.fillText(S.sala,W/2,160);x.fillStyle='#1b1b1b';x.font='20px '+F;x.fillText(t(35)+' #'+String(no).padStart(5,'0')+' · '+t(0)+' '+S.mesa,W/2,195);x.fillText(new Date().toLocaleString(S.loc),W/2,222);
 const w=winner();x.fillStyle='#fbbf24';x.fillRect(40,245,W-80,46);x.fillStyle='#1b1b1b';x.font='700 24px '+F;x.fillText(w?'👑 '+t(12)+': '+w:'🤝 '+t(28),W/2,277);let y=330;x.textAlign='left';x.font='20px '+F;
 S.names.slice(0,S.n).forEach((n,i)=>{x.textAlign='left';x.fillText(n,40,y);x.textAlign='right';x.fillText(sc[i]+' · SET '+sets[i],W-40,y);y+=34});y+=10;
@@ -222,7 +250,59 @@ $('inv').onclick=e=>{const x=e.target.closest('[data-x]');if(x){S.inv.splice(x.d
 $('iadd').onclick=()=>{S.inv.push({n:'Nuevo',p:0,s:0,m:3});save();rInv();rShop()};
 function rRep(){const a=S.sales,tt=a.reduce((x,s)=>x+s.tot,0),tc=a.reduce((x,s)=>x+s.cons,0),low=S.inv.filter(p=>p.s<=p.m).map(p=>p.n+' ('+p.s+')');$('rep').innerHTML='Cuentas: <b>'+a.length+'</b> · Ingresos: <b>'+fmt(tt)+'</b> · Tienda: <b>'+fmt(tc)+'</b><br>'+(low.length?'⚠ Stock bajo: '+esc(low.join(', ')):'✅ Stock OK')}
 $('rrs').onclick=()=>{S.sales=[];S.exp=[];save();rRep()};
-let PK='pin',PCB=()=>{};function askPin(k,cb){PK=k;PCB=cb;$('pin').value='';$('mpin').classList.add('on');setTimeout(()=>$('pin').focus(),150)}function openAdm(){fillAdm();fillCfg();$('sala').value=S.sala;rInv();rRep();$('madm').classList.add('on')}
+function stCalc(st){const ms=stElapsed(st),tCh=Math.round(ms/3600000*(st.rate??S.rate)),cCh=Object.entries(st.cart||{}).reduce((a,[k,q])=>{const p=prods().find(x=>x[0]==k);return a+(p?p[1]*q:0)},0),sb=tCh+cCh,tx=S.taxOn?Math.round(sb*S.tax/100):0;return{ms,tot:sb+tx}}// RED
+function getStationsData(){return stationsList.length?stationsList:Array.from({length:10},(_,i)=>({mesa:i+1,sc:Array(6).fill(0),sets:Array(6).fill(0),names:S.names,n:2,el:0,run:false,cart:{},rate:S.rate,closed:false,clients:0}))}// RED
+function tickStations(){// RED: actualiza relojes y totales de las 10 mesas sin destruir botones
+  const list=getStationsData();let actCount=0,cliCount=0,grandTot=0;
+  list.forEach(st=>{
+    const isCur=st.mesa===S.mesa,ms=isCur?currentElapsed():stCalc(st).ms,totVal=isCur?(sub()+taxAmt()):stCalc(st).tot,isRun=isCur?run:!!st.run;
+    if(isRun)actCount++;cliCount+=(st.clients||0);grandTot+=totVal;
+    const te=$('stt-'+st.mesa),me=$('stm-'+st.mesa);
+    if(te)te.textContent=hms(ms);
+    if(me)me.textContent=fmt(totVal);
+  });
+  $('stsum').innerHTML='Mesas activas: <b>'+actCount+'/10</b> · Dispositivos conectados: <b>'+cliCount+'</b> · Acumulado en curso: <b>'+fmt(grandTot)+'</b>';
+}
+function rStations(){// RED: renderiza las 10 estaciones de trabajo en Admin
+  const list=getStationsData();
+  $('stations').innerHTML=list.map(st=>{
+    const isCur=st.mesa===S.mesa;
+    const ms=isCur?currentElapsed():stCalc(st).ms;
+    const totVal=isCur?(sub()+taxAmt()):stCalc(st).tot;
+    const isRun=isCur?run:!!st.run;
+    const isClosed=isCur?closed:!!st.closed;
+    const scArr=isCur?sc:(st.sc||[0,0]);
+    const nmArr=isCur?S.names:(st.names||['J1','J2']);
+    const nPl=isCur?S.n:(st.n||2);
+    const cls=st.clients||0;
+    const badge=isRun?'🟢 EN JUEGO':(isClosed?'🧾 CERRADA':(ms>0?'⏸ PAUSA':'⚪ LIBRE'));
+    const scoreTxt=Array.from({length:Math.min(nPl,2)},(_,i)=>esc(nmArr[i]||'J'+(i+1))+': <b>'+(scArr[i]||0)+'</b>').join(' · ');
+    return '<div class="stcard'+(isRun?' run':'')+(isCur?' cur':'')+'">'
+      +'<div class="sttop"><span>🎱 Mesa '+st.mesa+(isCur?' (Aquí)':'')+'</span><span class="stbadge">'+badge+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between"><span>⏱ <b id="stt-'+st.mesa+'">'+hms(ms)+'</b></span><span>💰 <b id="stm-'+st.mesa+'">'+fmt(totVal)+'</b></span></div>'
+      +'<div class="st" style="display:flex;justify-content:space-between"><span>'+scoreTxt+'</span><span>👥 '+cls+' en red</span></div>'
+      +'<div class="stbtns">'
+      +'<button class="ac" data-st-act="toggle" data-m="'+st.mesa+'">'+(isRun?'⏸ Pausar':'▶ Iniciar')+'</button>'
+      +'<button data-st-act="select" data-m="'+st.mesa+'">🎛 Abrir</button>'
+      +'<button data-st-act="reset" data-m="'+st.mesa+'">🔄</button>'
+      +'<button data-st-act="copy" data-m="'+st.mesa+'" title="Copiar enlace de estación">📋 URL</button>'
+      +'</div></div>';
+  }).join('');
+  tickStations();
+}
+$('stations').onclick=e=>{// RED: acciones remotas sobre cualquiera de las 10 estaciones
+  const b=e.target.closest('[data-st-act]');if(!b)return;
+  const m=+b.dataset.m,act=b.dataset.stAct;
+  if(act==='select'){switchMesa(m);$('madm').classList.remove('on');toast('🎛 Controlando Mesa '+m);return}
+  if(act==='copy'){const u=location.origin+'/?mesa='+m;navigator.clipboard&&navigator.clipboard.writeText(u).then(()=>toast('📋 Copiado: '+u)).catch(()=>toast(u));return}
+  if(m===S.mesa){
+    if(act==='toggle'){$('go').click();rStations();return}
+    if(act==='reset'){doReset();rStations();return}
+  }
+  if(socket)socket.emit('station:cmd',{mesa:m,action:act});
+  toast(act==='toggle'?'⏱ Mesa '+m+' actualizada':'🔄 Mesa '+m+' reiniciada');
+};
+let PK='pin',PCB=()=>{};function askPin(k,cb){PK=k;PCB=cb;$('pin').value='';$('mpin').classList.add('on');setTimeout(()=>$('pin').focus(),150)}function openAdm(){fillAdm();fillCfg();$('sala').value=S.sala;rStations();rInv();rRep();$('madm').classList.add('on')}
 $('badm').onclick=()=>askPin('pin',openAdm);$('rs').onclick=()=>askPin('pinR',doReset);$('pcx').onclick=()=>$('mpin').classList.remove('on');
 const pgo=()=>{if(String($('pin').value).replace(/\D/g,'')===String(S[PK]||'6538').replace(/\D/g,'')){$('mpin').classList.remove('on');PCB()}else{toast('❌ Clave incorrecta');$('pin').value=''}};
 $('pgo').onclick=pgo;$('pin').onkeydown=e=>e.key=='Enter'&&pgo();$('aok').onclick=()=>$('madm').classList.remove('on');
@@ -289,6 +369,7 @@ window.addEventListener('bp-auth-changed',async e=>{
           else{window.BPCloud.saveSettings(S)}
           if(cloud.sales&&cloud.sales.length)S.sales=cloud.sales;
           if(cloud.expenses&&cloud.expenses.length)S.exp=cloud.expenses;
+          if(cloud.tables&&cloud.tables.length&&socket)socket.emit('stations:hydrate',cloud.tables);
           if(cloud.table){
             const tSt=cloud.table;
             sc=(tSt.sc||sc).slice();sets=(tSt.sets||sets).slice();S.names=(tSt.names||S.names).slice();
@@ -296,7 +377,7 @@ window.addEventListener('bp-auth-changed',async e=>{
             cart=Object.assign({},tSt.cart||{});S.mesa=tSt.mesa??S.mesa;S.rate=tSt.rate??S.rate;closed=!!tSt.closed;
           }
           save();$('mesa').value=S.mesa;$('rate').value=S.rate;
-          rI();rP();rS();rShop();rT();rB();fillCfg();pushState();
+          rI();rP();rS();rShop();rT();rB();fillCfg();if($('madm').classList.contains('on'))rStations();pushState();
         }
       }catch(err){console.error('Error cargando datos de Firestore:',err)}
     }

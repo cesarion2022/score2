@@ -11,6 +11,7 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
+  where,
 } from 'firebase/firestore';
 import { auth, db, googleAuthProvider } from './firebase.ts';
 
@@ -230,6 +231,7 @@ const BPCloud = {
   async loadAll(mesaId = 1): Promise<{
     settings: Record<string, any> | null;
     table: Record<string, any> | null;
+    tables: Record<string, any>[];
     sales: Record<string, any>[];
     expenses: Record<string, any>[];
   } | null> {
@@ -237,11 +239,13 @@ const BPCloud = {
     const uid = currentUser.uid;
     const settingsPath = `users/${uid}/club/settings`;
     const tablePath = `users/${uid}/tables/${mesaId}`;
+    const tablesPath = `users/${uid}/tables`;
     const salesPath = `users/${uid}/sales`;
     const expensesPath = `users/${uid}/expenses`;
 
     let settings: Record<string, any> | null = null;
     let table: Record<string, any> | null = null;
+    const tables: Record<string, any>[] = [];
     const sales: Record<string, any>[] = [];
     const expenses: Record<string, any>[] = [];
 
@@ -260,7 +264,20 @@ const BPCloud = {
     }
 
     try {
-      const sq = query(collection(db, 'users', uid, 'sales'), orderBy('d', 'desc'), limit(200));
+      const tq = query(collection(db, 'users', uid, 'tables'), where('uid', '==', uid), limit(10));
+      const tList = await getDocs(tq);
+      tList.forEach((d) => tables.push(d.data()));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.LIST, tablesPath);
+    }
+
+    try {
+      const sq = query(
+        collection(db, 'users', uid, 'sales'),
+        where('uid', '==', uid),
+        orderBy('d', 'desc'),
+        limit(200)
+      );
       const sList = await getDocs(sq);
       sList.forEach((d) => sales.push({ id: d.id, ...d.data() }));
       sales.reverse();
@@ -269,7 +286,12 @@ const BPCloud = {
     }
 
     try {
-      const eq = query(collection(db, 'users', uid, 'expenses'), orderBy('d', 'desc'), limit(200));
+      const eq = query(
+        collection(db, 'users', uid, 'expenses'),
+        where('uid', '==', uid),
+        orderBy('d', 'desc'),
+        limit(200)
+      );
       const eList = await getDocs(eq);
       eList.forEach((d) => expenses.push({ id: d.id, ...d.data() }));
       expenses.reverse();
@@ -277,7 +299,7 @@ const BPCloud = {
       handleFirestoreError(error, OperationType.LIST, expensesPath);
     }
 
-    return { settings, table, sales, expenses };
+    return { settings, table, tables, sales, expenses };
   },
   saveSettings(S: Record<string, any>): void {
     if (!currentUser || !userDocReady) return;
